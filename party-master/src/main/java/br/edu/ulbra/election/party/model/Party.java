@@ -16,16 +16,12 @@ public class Party {
     @Column(nullable = false)
     private String name;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private Integer number;
 
-    public String getCode() {
-        return code;
-    }
+    public Long getId() { return id; }
 
-    public void setCode(String code) {
-        this.code = code;
-    }
+    public void setId(Long id) { this.id = id; }
 
     public String getName() {
         return name;
@@ -35,11 +31,11 @@ public class Party {
         this.name = name;
     }
 
-    public Integer getNumber() {
-        return number;
-    }
+    public String getCode() { return code; }
 
-    public void setNumber(Integer number) {
-        this.number = number;
-    }
+    public void setCode(String code) { this.code = code; }
+
+    public Integer getNumber() { return number; }
+
+    public void setNumber(Integer number) { this.number = number; }
 }
