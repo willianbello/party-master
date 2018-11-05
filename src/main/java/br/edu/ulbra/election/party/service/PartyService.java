@@ -71,7 +71,7 @@ public class PartyService {
         try {
             party.setName(partyInput.getName());
             party.setNumber(partyInput.getNumber());
-            party.setId(partyInput.getId());
+            //party.setId(partyInput.getId());
             party.setCode(partyInput.getCode());
         }catch (Exception e){
             System.out.println("Erro ao setar valores");
