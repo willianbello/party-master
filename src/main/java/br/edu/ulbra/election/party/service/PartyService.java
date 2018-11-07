@@ -6,6 +6,7 @@ import br.edu.ulbra.election.party.model.Party;
 import br.edu.ulbra.election.party.output.v1.PartyOutput;
 import br.edu.ulbra.election.party.output.v1.GenericOutput;
 import br.edu.ulbra.election.party.repository.PartyRepository;
+import org.apache.commons.lang.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,12 +18,17 @@ import java.util.List;
 @Service
 public class PartyService {
 
+
+
     private final PartyRepository partyRepository;
 
     private final ModelMapper modelMapper;
 
     private static final String MESSAGE_INVALID_ID = "Invalid id";
-    private static final String MESSAGE_VOTER_NOT_FOUND = "Party not found";
+    private static final String MESSAGE_PARTY_NOT_FOUND = "Party not found";
+    private static final String MESSAGE_INVALID_NUMBER = "Invalid number";
+    private static final String MESSAGE_NUMBER_NOT_FOUND = "Number not found";
+    private static final String MESSAGE_NUMBER_OR_CODE_ALREADY_REGISTERED = "number or code already registered";
 
     @Autowired
     public PartyService(PartyRepository partyRepository, ModelMapper modelMapper){
@@ -49,12 +55,39 @@ public class PartyService {
             throw new GenericOutputException(MESSAGE_INVALID_ID);
         }
 
-        Party party = partyRepository.findById(id).orElse(null);
+        Party party = partyRepository.getById(id).orElse(null);
         if (party == null){
-            throw new GenericOutputException(MESSAGE_VOTER_NOT_FOUND);
+            throw new GenericOutputException(MESSAGE_PARTY_NOT_FOUND);
         }
+        System.out.println("ID encontrado : " + party.getId());
+        new GenericOutput("ID encontrado : " + party.getId().toString());
 
         return modelMapper.map(party, PartyOutput.class);
+    }
+
+    public String validateByCode(String code){
+        if (code == null){
+            throw new GenericOutputException(MESSAGE_NUMBER_OR_CODE_ALREADY_REGISTERED);
+        }
+
+        String searchCode = partyRepository.findByCode(code).orElse(null);
+        if (searchCode != null){
+            throw new GenericOutputException(MESSAGE_NUMBER_OR_CODE_ALREADY_REGISTERED);
+        }
+        return searchCode;
+    }
+
+    public Integer validateByNumber(Integer number){
+        if (number == null){
+            throw new GenericOutputException(MESSAGE_INVALID_NUMBER);
+        }
+
+        Integer searchNumber = partyRepository.findByNumber(number).orElse(null);
+        if (searchNumber != null){
+            throw new GenericOutputException(MESSAGE_NUMBER_NOT_FOUND);
+        }
+
+        return searchNumber;
     }
 
     public PartyOutput update(Long id, PartyInput partyInput) {
@@ -65,7 +98,7 @@ public class PartyService {
 
         Party party = partyRepository.findById(id).orElse(null);
         if (party == null){
-            throw new GenericOutputException(MESSAGE_VOTER_NOT_FOUND);
+            throw new GenericOutputException(MESSAGE_PARTY_NOT_FOUND);
         }
 
         try {
@@ -88,8 +121,10 @@ public class PartyService {
 
         Party party = partyRepository.findById(id).orElse(null);
         if (party == null){
-            throw new GenericOutputException(MESSAGE_VOTER_NOT_FOUND);
+            throw new GenericOutputException(MESSAGE_PARTY_NOT_FOUND);
         }
+        System.out.println("ID encontrado : " + party.getId());
+        new GenericOutput("ID encontrado : " + party.getId().toString());
 
         partyRepository.delete(party);
 
@@ -97,18 +132,33 @@ public class PartyService {
     }
 
     private void validateInput(PartyInput partyInput, boolean isUpdate){
-        //if (StringUtils.isBlank(voterInput.getEmail())){
-        //    throw new GenericOutputException("Invalid email");
-        //}
-        //if (StringUtils.isBlank(voterInput.getName())){
-        //    throw new GenericOutputException("Invalid name");
-        //}
+        if (StringUtils.isBlank(partyInput.getCode())){
+            throw new GenericOutputException("Invalid code");
+        }
+        if (StringUtils.isBlank(partyInput.getName())){
+            throw new GenericOutputException("Invalid name");
+        }
+        /*
+        expressões para matches
+        ^ verifica se a expressão começa com
+        (?i: inicia um grupo com case-insensitive
+        [a-z]+ verifica palavras com as letras de a-z até encontrar um espaço (note que após o + tem um espaço)
+        [a-z ]+) verifica palavras com as letras de a-z e espaços, ou seja pode conter mais de uma palavra com espaço até encontrar o final do grupo (grupo para case-insensitive)
+        $ verifica se a string termina exatamente conforme a expressão
+         */
+        if (!partyInput.getName().matches("^(?i:[a-z]+ [a-z ]+)$")){
+            throw new GenericOutputException("Need a last name");
+        }
 
-       // } else {
-            //if (!isUpdate) {
-              //  throw new GenericOutputException("Password doesn't match");
-            //}
-        //}
+        if (partyInput.getName().length() < 5){
+            throw new GenericOutputException("Invalid name. Min. 5 letters");
+        }
+        if (partyInput.getNumber().toString().length() < 2 || partyInput.getNumber().toString().length() > 2){
+            throw new GenericOutputException("Invalid Number");
+        }
+        validateByNumber(partyInput.getNumber());
+        validateByCode(partyInput.getCode());
+
     }
 
 }

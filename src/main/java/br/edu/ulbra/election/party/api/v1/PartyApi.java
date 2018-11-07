@@ -27,7 +27,7 @@ public class PartyApi {
         //return new ArrayList<>();
     }
 
-    @GetMapping("/{partyId}")
+    @GetMapping("/{id}")
     @ApiOperation(value = "Get party by Id")
     public PartyOutput getById(@PathVariable Long id){
         return partyService.getById(id);
@@ -41,14 +41,14 @@ public class PartyApi {
         //return new PartyOutput();
     }
 
-    @PostMapping("/{partyId}")
+    @PostMapping("/{id}")
     @ApiOperation(value = "Update party")
     public PartyOutput update(@PathVariable Long id, @RequestBody PartyInput partyInput){
         return partyService.update(id, partyInput);
         //return new PartyOutput();
     }
 
-    @DeleteMapping("/{partyId}")
+    @DeleteMapping("/{id}")
     @ApiOperation(value = "Delete party")
     public GenericOutput delete(@PathVariable Long id){
         return partyService.delete(id);

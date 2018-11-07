@@ -6,7 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 @ApiModel(description = "Party Output Information")
 public class PartyOutput {
 
-    @ApiModelProperty(example = "1", notes = "Party Unique Identification")
+    @ApiModelProperty(example = "2", notes = "Party Unique Identification")
     private Long id;
     @ApiModelProperty(example = "PJ", notes = "Party Code")
     private String code;
